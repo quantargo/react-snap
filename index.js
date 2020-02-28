@@ -12,13 +12,15 @@ const minimalcss = require("minimalcss");
 const CleanCSS = require("clean-css");
 const twentyKb = 20 * 1024;
 
+const reactSnapInclude = require("./src/reactSnapInclude.js").reactSnapInclude;
+
 const defaultOptions = {
   //# stable configurations
   port: 45678,
   source: "build",
   destination: null,
   concurrency: 4,
-  include: ["/"],
+  include: reactSnapInclude(),
   userAgent: "ReactSnap",
   // 4 params below will be refactored to one: `puppeteer: {}`
   // https://github.com/stereobooster/react-snap/issues/120
@@ -26,7 +28,15 @@ const defaultOptions = {
   puppeteer: {
     cache: true
   },
-  puppeteerArgs: [],
+  puppeteerArgs: [
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--disable-setuid-sandbox",
+    "--no-first-run",
+    "--no-sandbox",
+    "--no-zygote",
+    "--single-process"
+  ],
   puppeteerExecutablePath: undefined,
   puppeteerIgnoreHTTPSErrors: false,
   publicPath: "/",
@@ -63,7 +73,7 @@ const defaultOptions = {
   inlineCss: false,
   //# feature creeps to generate screenshots
   saveAs: "html",
-  crawl: true,
+  crawl: false,
   waitFor: false,
   externalServer: false,
   //# even more workarounds
