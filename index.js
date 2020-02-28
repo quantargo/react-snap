@@ -13,6 +13,7 @@ const CleanCSS = require("clean-css");
 const twentyKb = 20 * 1024;
 
 const reactSnapInclude = require("./src/reactSnapInclude.js").reactSnapInclude();
+//console.log("React Snap routes:", reactSnapInclude)
 
 const defaultOptions = {
   //# stable configurations
