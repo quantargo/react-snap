@@ -32,6 +32,6 @@ module.exports.getAllContents = async function () {
     // 'Key' defines the partition key and sort key of the item to be retrievedxw
     ProjectionExpression: 'contentId',
   }
-  const result = (await call('scan', params)).Items.map(i => '/courses/' + i.contentId.split('#').join('/'))
+  const result = (await call('scan', params, true, true)).Items.map(i => '/courses/' + i.contentId.split('#').join('/'))
   return result
 }
