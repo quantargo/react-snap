@@ -12,8 +12,7 @@ const minimalcss = require("minimalcss");
 const CleanCSS = require("clean-css");
 const twentyKb = 20 * 1024;
 
-const reactSnapInclude = require("./src/reactSnapInclude.js").reactSnapInclude();
-//console.log("React Snap routes:", reactSnapInclude)
+const reactSnapInclude = require("./src/reactSnapInclude.js").reactSnapInclude
 
 const defaultOptions = {
   //# stable configurations
@@ -21,7 +20,7 @@ const defaultOptions = {
   source: "build",
   destination: null,
   concurrency: 4,
-  include: reactSnapInclude,
+  include: ["/"],
   userAgent: "ReactSnap",
   // 4 params below will be refactored to one: `puppeteer: {}`
   // https://github.com/stereobooster/react-snap/issues/120
@@ -93,7 +92,7 @@ const defaultOptions = {
  * @param {{source: ?string, destination: ?string, include: ?Array<string>, sourceMaps: ?boolean, skipThirdPartyRequests: ?boolean }} userOptions
  * @return {*}
  */
-const defaults = userOptions => {
+const defaults = async userOptions => {
   const options = {
     ...defaultOptions,
     ...userOptions
@@ -659,7 +658,9 @@ const saveAsJpeg = ({ page, filePath, options, route }) => {
 const run = async (userOptions, { fs } = { fs: nativeFs }) => {
   let options;
   try {
-    options = defaults(userOptions);
+    options = await defaults(userOptions);
+    options.include = await reactSnapInclude()
+    //console.log("options.include", options.include)
   } catch (e) {
     return Promise.reject(e.message);
   }

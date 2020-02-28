@@ -36,7 +36,6 @@ module.exports.reactSnapInclude = async function () {
 
         let allContents = await dynamodbLib.getAllContents()
         out = out.concat(allContents)
-        console.log("out", out)
         return out
     } catch (e) {
         console.log(e)
