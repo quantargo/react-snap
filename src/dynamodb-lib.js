@@ -31,6 +31,10 @@ module.exports.getAllContents = async function () {
     TableName: 'contents',
     // 'Key' defines the partition key and sort key of the item to be retrievedxw
     ProjectionExpression: 'contentId',
+    FilterExpression: 'moduleId <> :moduleId',
+    ExpressionAttributeValues : {
+      ':moduleId' : 'blog',
+    }
   }
   const result = (await call('scan', params, true, true)).Items.map(i => '/courses/' + i.contentId.split('#').join('/'))
   return result
