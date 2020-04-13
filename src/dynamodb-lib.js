@@ -31,9 +31,12 @@ module.exports.getAllContents = async function () {
     TableName: 'contents',
     // 'Key' defines the partition key and sort key of the item to be retrievedxw
     ProjectionExpression: 'contentId',
-    FilterExpression: 'moduleId <> :moduleId',
+    FilterExpression: 'moduleId <> :moduleId AND contentType <> :ctype1 AND contentType <> :ctype2 AND contentType <> :ctype3',
     ExpressionAttributeValues : {
       ':moduleId' : 'blog',
+      ':ctype1' : 'dependency',
+      ':ctype2' : 'badge',
+      ':ctype3' : 'course'
     }
   }
   const result = (await call('scan', params, true, true)).Items.map(i => '/courses/' + i.contentId.split('#').join('/'))
