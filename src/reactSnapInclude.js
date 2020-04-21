@@ -24,6 +24,7 @@ module.exports.reactSnapInclude = async function () {
             "/blog/post/2019-02-25-meetup-announcement",
             "/blog/post/2019-04-11-viennar-meetup-march-impressions",
             "/blog/post/2019-01-23-why-management-loves-overfitting",
+            "/blog/post/2020-04-21-new-course-platform-launch",
             "/team",
             "/login",
             "/contact",
