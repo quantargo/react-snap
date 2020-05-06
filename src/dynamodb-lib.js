@@ -26,19 +26,74 @@ async function call(action, params, stagetable = true, paginate = false) {
   }
 }
 
-module.exports.getAllContents = async function () {
+async function getContent (moduleId, contentId) {
   const params = {
     TableName: 'contents',
-    // 'Key' defines the partition key and sort key of the item to be retrievedxw
-    ProjectionExpression: 'contentId',
-    FilterExpression: 'moduleId <> :moduleId AND contentType <> :ctype1 AND contentType <> :ctype2 AND contentType <> :ctype3',
-    ExpressionAttributeValues : {
-      ':moduleId' : 'blog',
-      ':ctype1' : 'dependency',
-      ':ctype2' : 'badge',
-      ':ctype3' : 'course'
+    Key: {
+      moduleId: moduleId,
+      contentId: contentId
     }
   }
-  const result = (await call('scan', params, true, true)).Items.map(i => '/courses/' + i.contentId.split('#').join('/'))
+  const result = (await call('get', params)).Item
+  return result
+}
+
+module.exports.getAllContents = async function () {
+
+  const paramsMain = {
+    TableName: 'contents',
+    IndexName: 'type-contentId-index',
+    ProjectionExpression: 'contentId',
+    KeyConditionExpression: 'contentType = :contentType',
+    ExpressionAttributeValues : {
+      ':contentType' : 'main',
+    }
+  }
+  const cidMain = (await call('query', paramsMain)).Items.map(i => i.contentId)
+  //console.log('cidMain', cidMain)
+
+  const paramsBlog = {
+    TableName: 'contents',
+    IndexName: 'type-contentId-index',
+    ProjectionExpression: 'contentId',
+    KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
+    ExpressionAttributeValues : {
+      ':contentType' : 'index',
+      ':contentId' : 'blog',
+    }
+  }
+  const cidBlog = (await call('query', paramsBlog)).Items.map(i => i.contentId)
+  //console.log('cidBlog', cidBlog)
+
+  const paramsCourse = {
+    TableName: 'contents',
+    IndexName: 'type-contentId-index',
+    KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
+    ExpressionAttributeValues : {
+      ':contentType' : 'index',
+      ':contentId' : 'course-r-introduction',
+    }
+  }
+  const cidCourse = (await call('query', paramsCourse)).Items.map(i => i.contentId)
+  //console.log('cidCourse', cidCourse)
+
+  let cidContents = await Promise.all(cidCourse.map(i => {
+    return getContent(i.split('#')[0], i).then(j => {
+      return j.contents.map(c => c.content)
+    })
+  }))
+  cidContents = [].concat.apply([], cidContents)
+  //console.log('cidContents', cidContents)
+
+  let result = [...cidMain, ...cidBlog, ...cidCourse, ...cidContents].sort()
+  result = [...new Set(result)]
+  result = result.map(i => {
+    let prefix = '/'
+    if (i.startsWith('course')) {
+      prefix = '/courses/'
+    }
+    return prefix + i.split('#').join('/')
+  })
+  //console.log('result', result)
   return result
 }
