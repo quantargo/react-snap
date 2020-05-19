@@ -38,19 +38,41 @@ async function getContent (moduleId, contentId) {
   return result
 }
 
+function escapeRegExp(str) {
+  return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
 module.exports.getAllContents = async function () {
 
-  const paramsMain = {
+  const paramsMainCourse = {
     TableName: 'contents',
     IndexName: 'type-contentId-index',
     ProjectionExpression: 'contentId',
-    KeyConditionExpression: 'contentType = :contentType',
+    KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
     ExpressionAttributeValues : {
       ':contentType' : 'main',
+      ':contentId' : 'course',
     }
   }
-  const cidMain = (await call('query', paramsMain)).Items.map(i => i.contentId)
+  const cidMainCourse = (await call('query', paramsMainCourse)).Items.map(i => i.contentId)
   //console.log('cidMain', cidMain)
+
+  const paramsMainQbit = {
+    TableName: 'contents',
+    IndexName: 'type-contentId-index',
+    ProjectionExpression: 'contentId',
+    KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
+    ExpressionAttributeValues : {
+      ':contentType' : 'main',
+      ':contentId' : 'qbit',
+    }
+  }
+  let cidMainQbit = (await call('query', paramsMainQbit)).Items.map(i => i.contentId)
+  cidMainQbit = cidMainQbit.map(c => replaceAll(c, '#', '%23'))
 
   const paramsBlog = {
     TableName: 'contents',
@@ -85,12 +107,14 @@ module.exports.getAllContents = async function () {
   cidContents = [].concat.apply([], cidContents)
   //console.log('cidContents', cidContents)
 
-  let result = [...cidMain, ...cidBlog, ...cidCourse, ...cidContents].sort()
+  let result = [...cidMainCourse, ...cidBlog, ...cidCourse, ...cidContents, ...cidMainQbit].sort()
   result = [...new Set(result)]
   result = result.map(i => {
     let prefix = '/'
     if (i.startsWith('course')) {
       prefix = '/courses/'
+    } else if (i.startsWith('qbit')) {
+      prefix = '/qbits/'
     }
     return prefix + i.split('#').join('/')
   })
