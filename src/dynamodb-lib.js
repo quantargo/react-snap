@@ -55,7 +55,7 @@ module.exports.getAllContents = async function () {
     KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
     ExpressionAttributeValues : {
       ':contentType' : 'main',
-      ':contentId' : 'course',
+      ':contentId' : 'course-r-introduction',
     }
   }
   const cidMainCourse = (await call('query', paramsMainCourse)).Items.map(i => i.contentId)
