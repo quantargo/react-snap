@@ -50,7 +50,7 @@ module.exports.getAllContents = async function () {
 
   const paramsMainCourse = {
     TableName: 'contents',
-    IndexName: 'type-contentId-index',
+    IndexName: 'type-contentId-index-2',
     ProjectionExpression: 'contentId',
     KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
     ExpressionAttributeValues : {
@@ -63,7 +63,7 @@ module.exports.getAllContents = async function () {
 
   const paramsMainQbit = {
     TableName: 'contents',
-    IndexName: 'type-contentId-index',
+    IndexName: 'type-contentId-index-2',
     ProjectionExpression: 'contentId',
     KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
     ExpressionAttributeValues : {
@@ -76,7 +76,7 @@ module.exports.getAllContents = async function () {
 
   const paramsBlog = {
     TableName: 'contents',
-    IndexName: 'type-contentId-index',
+    IndexName: 'type-contentId-index-2',
     ProjectionExpression: 'contentId',
     KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
     ExpressionAttributeValues : {
@@ -89,7 +89,7 @@ module.exports.getAllContents = async function () {
 
   const paramsCourse = {
     TableName: 'contents',
-    IndexName: 'type-contentId-index',
+    IndexName: 'type-contentId-index-2',
     KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
     ExpressionAttributeValues : {
       ':contentType' : 'index',
