@@ -55,13 +55,13 @@ module.exports.getAllContents = async function () {
     KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
     ExpressionAttributeValues : {
       ':contentType' : 'main',
-      ':contentId' : 'course-r-introduction',
+      ':contentId' : 'course',
     }
   }
   const cidMainCourse = (await call('query', paramsMainCourse)).Items.map(i => i.contentId)
-  //console.log('cidMain', cidMain)
+  console.log('cidMainCourse', cidMainCourse)
 
-  const paramsMainQbit = {
+  /* const paramsMainQbit = {
     TableName: 'contents',
     IndexName: 'type-contentId-index-2',
     ProjectionExpression: 'contentId',
@@ -73,7 +73,7 @@ module.exports.getAllContents = async function () {
   }
   let cidMainQbit = (await call('query', paramsMainQbit)).Items.map(i => i.contentId)
   cidMainQbit = cidMainQbit.map(c => replaceAll(c, '#', '%23'))
-
+  */
   const paramsBlog = {
     TableName: 'contents',
     IndexName: 'type-contentId-index-2',
@@ -87,18 +87,22 @@ module.exports.getAllContents = async function () {
   const cidBlog = (await call('query', paramsBlog)).Items.map(i => i.contentId)
   //console.log('cidBlog', cidBlog)
 
-  const paramsCourse = {
-    TableName: 'contents',
-    IndexName: 'type-contentId-index-2',
-    KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
-    ExpressionAttributeValues : {
-      ':contentType' : 'index',
-      ':contentId' : 'course-r-introduction',
+  let cidCourse = await Promise.all(cidMainCourse.map(async id => {
+    const paramsCourse = {
+      TableName: 'contents',
+      IndexName: 'type-contentId-index-2',
+      KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
+      ExpressionAttributeValues : {
+        ':contentType' : 'index',
+        ':contentId' : 'course-r-introduction',
+      }
     }
-  }
-  const cidCourse = (await call('query', paramsCourse)).Items.map(i => i.contentId)
-  //console.log('cidCourse', cidCourse)
-
+    return call('query', paramsCourse).then(c => {
+      c.Items.map(i => i.contentId)
+    })
+  }))
+  cidCourse = [].concat.apply([], cidCourse)
+  console.log('cidCourse', cidCourse)
   let cidContents = await Promise.all(cidCourse.map(i => {
     return getContent(i.split('#')[0], i).then(j => {
       return j.contents.map(c => c.content)
@@ -107,7 +111,7 @@ module.exports.getAllContents = async function () {
   cidContents = [].concat.apply([], cidContents)
   //console.log('cidContents', cidContents)
 
-  let result = [...cidMainCourse, ...cidBlog, ...cidCourse, ...cidContents, ...cidMainQbit].sort()
+  let result = [...cidMainCourse, ...cidBlog, ...cidCourse, ...cidContents].sort()
   result = [...new Set(result)]
   result = result.map(i => {
     let prefix = '/'
@@ -118,6 +122,6 @@ module.exports.getAllContents = async function () {
     }
     return prefix + i.split('#').join('/')
   })
-  //console.log('result', result)
+  console.log('result', result)
   return result
 }
