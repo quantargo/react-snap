@@ -94,7 +94,7 @@ module.exports.getAllContents = async function () {
       KeyConditionExpression: 'contentType = :contentType AND begins_with(contentId, :contentId)',
       ExpressionAttributeValues : {
         ':contentType' : 'index',
-        ':contentId' : 'course-r-introduction',
+        ':contentId' : 'course',
       }
     }
     return call('query', paramsCourse).then(c => {
