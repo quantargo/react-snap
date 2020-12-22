@@ -98,7 +98,7 @@ module.exports.getAllContents = async function () {
       }
     }
     return call('query', paramsCourse).then(c => {
-      c.Items.map(i => i.contentId)
+      return c.Items.map(i => i.contentId)
     })
   }))
   cidCourse = [].concat.apply([], cidCourse)
