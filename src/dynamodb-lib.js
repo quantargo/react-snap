@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 
 AWS.config.update({ region: 'eu-central-1' })
 //const stage = process.env.stage
-const stage = 'dev'
+const stage = 'prod'
 
 async function call(action, params, stagetable = true, paginate = false) {  
   const dynamoDb = new AWS.DynamoDB.DocumentClient()
